@@ -1,13 +1,18 @@
-FROM public.ecr.aws/docker/library/alpine:3.15.0
+FROM python:3.11-slim
 
-ENV TARGET=0.0.0.0
-ENV PORT=8080
+WORKDIR /app
 
-COPY requirements.txt /
+# Copy dependencies first
+COPY requirements.txt .
 
-RUN apk add --no-cache curl netcat-openbsd python3 py3-pip python3-dev libpq-dev gcc postgresql &&\
-  pip install -r /requirements.txt
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY main.py /
+# Copy application code
+COPY . .
 
-CMD [ "/main.py" ]
+# App Runner listens on this port
+EXPOSE 8080
+
+# Correct way to start FastAPI app
+CMD ["python", "main.py"]
